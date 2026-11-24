@@ -80,7 +80,7 @@
   }
 
   function bindPanels() {
-    var names = { sound: 'panel-sound', map: 'panel-map', journal: 'panel-journal', letgo: 'panel-letgo', more: 'panel-more' };
+    var names = { sound: 'panel-sound', map: 'panel-map', journal: 'panel-journal', letgo: 'panel-letgo', coffee: 'panel-coffee', more: 'panel-more' };
     Object.keys(names).forEach(function (k) {
       var el = $(names[k]);
       if (!el) return;
@@ -94,6 +94,10 @@
     panels.journal.onOpen = journalOpen;
     panels.letgo.onOpen = function () { var i = $('lg-input'); if (i) i.value = ''; };
     panels.more.onOpen = buildMore;
+    var qr = $('cf-qr');
+    function qrCheck() { if (qr && qr.complete && !qr.naturalWidth) { qr.hidden = true; $('cf-missing').hidden = false; } }
+    if (qr) qr.addEventListener('error', qrCheck);
+    panels.coffee.onOpen = qrCheck;
     D.addEventListener('click', function (e) {
       if (e.target.closest && e.target.closest('[data-close]')) closePanel();
     });
@@ -554,7 +558,7 @@
   }
 
   /* ================================================================ more (phone) */
-  var MORE = [['journal', 'Journal'], ['breathe', 'Breathe'], ['letgo', 'Let go'], ['time', 'Time of day'], ['still', 'Still mode'], ['hide', 'Hide the interface']];
+  var MORE = [['journal', 'Journal'], ['breathe', 'Breathe'], ['letgo', 'Let go'], ['coffee', 'A coffee'], ['time', 'Time of day'], ['still', 'Still mode'], ['hide', 'Hide the interface']];
   function buildMore() {
     var ul = $('more-list');
     ul.textContent = '';
@@ -614,6 +618,7 @@
       case 'map': openPanel('map', opener); break;
       case 'journal': openPanel('journal', opener); break;
       case 'letgo': openPanel('letgo', opener); break;
+      case 'coffee': openPanel('coffee', opener); break;
       case 'more': openPanel('more', opener); break;
       case 'breathe': startBreathe(); break;
       case 'time':

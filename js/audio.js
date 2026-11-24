@@ -199,6 +199,36 @@
     return g;
   }
 
+  /* iOS/Android: route WebAudio as media (ignores the silent switch) and keep the context alive */
+  var kickEl = null;
+  function mobileKick() {
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) { /* ignore */ }
+    try {
+      if (!kickEl) {
+        var n = 800, rate = 8000, buf = new ArrayBuffer(44 + n), v = new DataView(buf), i;
+        var w = function (o, t) { for (var k = 0; k < t.length; k++) v.setUint8(o + k, t.charCodeAt(k)); };
+        w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true);
+        v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate, true);
+        v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+        for (i = 0; i < n; i++) v.setUint8(44 + i, 128);
+        kickEl = new Audio(URL.createObjectURL(new Blob([buf], { type: 'audio/wav' })));
+        kickEl.loop = true; kickEl.setAttribute('playsinline', ''); kickEl.volume = 0.01;
+      }
+      var pr = kickEl.play(); if (pr && pr.catch) pr.catch(function () { /* ignore */ });
+    } catch (e) { /* ignore */ }
+    try {
+      if (ctx) {
+        var b = ctx.createBuffer(1, 1, 22050), src = ctx.createBufferSource();
+        src.buffer = b; src.connect(ctx.destination); src.start(0);
+      }
+    } catch (e) { /* ignore */ }
+  }
+  function revive() {
+    if (!ctx || !unlocked) return;
+    if (ctx.state !== 'running') { try { ctx.resume(); } catch (e) { /* ignore */ } }
+    if (kickEl && kickEl.paused) { try { var q = kickEl.play(); if (q && q.catch) q.catch(function () { /* ignore */ }); } catch (e) { /* ignore */ } }
+  }
+
   function build() {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return false;
@@ -238,8 +268,10 @@
     tickTimer = setInterval(tick, TICK_MS);
     try {
       document.addEventListener('visibilitychange', function () {
-        if (!document.hidden && ctx && ctx.state !== 'running') { try { ctx.resume(); } catch (e) { /* ignore */ } }
+        if (!document.hidden) revive();
       });
+      ['touchend', 'pointerdown', 'click'].forEach(function (ev) { document.addEventListener(ev, revive, { passive: true }); });
+      ctx.onstatechange = function () { if (ctx.state !== 'running' && !document.hidden) revive(); };
     } catch (e) { /* ignore */ }
     return true;
   }
@@ -1034,6 +1066,7 @@
         if (!ctx) {
           if (!build()) return Promise.resolve(false);
         }
+        mobileKick();
         var p = (ctx.state !== 'running') ? ctx.resume() : null;
         emit();
         return Promise.resolve(p).then(function () { emit(); return true; }, function () { return false; });

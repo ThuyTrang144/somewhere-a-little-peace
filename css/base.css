@@ -295,6 +295,7 @@ dialog.panel::backdrop { background: rgba(59, 47, 39, .32); animation: pn-fade .
 .panel-map { width: min(960px, calc(100vw - 32px)); }
 .panel-journal { width: min(640px, calc(100vw - 32px)); }
 .panel-letgo { width: min(480px, calc(100vw - 32px)); }
+.panel-coffee { width: min(420px, calc(100vw - 32px)); }
 .panel-more { width: min(420px, calc(100vw - 32px)); }
 
 .sheet { position: relative; isolation: isolate; animation: sheet-up .6s var(--ease-soft) both; }
@@ -533,7 +534,7 @@ html[data-motion="reduced"] .card { transition-duration: .01s; }
   .op-text { left: 22px; right: 22px; width: auto; bottom: calc(clamp(40px, 11vh, 90px) + var(--safe-b)); }
   .op-title { font-size: clamp(2.6rem, 13vw, 3.8rem); }
 
-  dialog.panel, .panel-sound, .panel-map, .panel-journal, .panel-letgo, .panel-more {
+  dialog.panel, .panel-sound, .panel-map, .panel-journal, .panel-letgo, .panel-coffee, .panel-more {
     inset: auto 0 0 0; margin: 0; width: 100%; max-width: 100%;
   }
   .sheet::before { border-radius: 14px 14px 0 0; }
@@ -549,3 +550,8 @@ html[data-motion="reduced"] .card { transition-duration: .01s; }
   .op-title { font-size: 2.6rem; }
   .op-actions { margin-top: .9rem; flex-direction: row; align-items: center; gap: 1.4rem; }
 }
+
+.cf-fig { margin: 0 auto 1rem; display: grid; place-items: center; }
+.cf-qr { display: block; width: min(240px, 62vw); height: auto; padding: 12px; background: #fffdf6; border-radius: 14px; box-shadow: 0 6px 22px rgba(90, 70, 40, .18); }
+.cf-missing { margin: 0; font: 400 1.3rem/1.3 var(--font-hand); color: var(--ink-soft); }
+.cf-note { margin: 0; text-align: center; font: 400 1.15rem/1.35 var(--font-hand); color: var(--ink-soft); }
