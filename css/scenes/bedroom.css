@@ -1,0 +1,40 @@
+/* Bedroom overlays on the painted stage. Prefix: br- */
+
+/* window light: day/dusk bloom, night is the painting's own moonlight */
+.scene-bedroom .br-windowglow { opacity: .5; transition: opacity 4s ease-in-out; animation: br-breath 12s ease-in-out infinite; }
+html[data-time="dusk"] .scene-bedroom .br-windowglow { opacity: .3; }
+html[data-time="night"] .scene-bedroom .br-windowglow { opacity: .1; --c: rgba(190, 210, 255, .5); }
+@keyframes br-breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+
+/* moon parallelogram across the bed (night) and a morning sun patch (day/dusk) */
+.scene-bedroom .br-moonshaft, .scene-bedroom .br-sunshaft {
+  mix-blend-mode: screen; opacity: 0; filter: blur(6px); transition: opacity 4s ease-in-out;
+  clip-path: polygon(14% 0, 78% 0, 100% 100%, 0 100%);
+}
+.scene-bedroom .br-moonshaft { background: linear-gradient(180deg, rgba(196, 214, 255, .34), rgba(196, 214, 255, .04)); }
+.scene-bedroom .br-sunshaft { background: linear-gradient(180deg, rgba(255, 238, 190, .4), rgba(246, 217, 160, .04)); }
+html[data-time="night"] .scene-bedroom .br-moonshaft { opacity: .7; animation: br-shaft 14s ease-in-out infinite; }
+html[data-time="day"] .scene-bedroom .br-sunshaft { opacity: .75; animation: br-shaft 14s ease-in-out infinite; }
+html[data-time="dusk"] .scene-bedroom .br-sunshaft { opacity: .45; filter: blur(6px) sepia(.7) saturate(1.5); }
+@keyframes br-shaft { 0%, 100% { filter: blur(6px) brightness(.85); } 50% { filter: blur(6px) brightness(1.1); } }
+
+/* lamp */
+.scene-bedroom .br-lampglow { opacity: 0; transition: opacity 1.4s ease-in-out; }
+.scene-bedroom.br-lamp-on .br-lampglow { opacity: .75; animation: br-lamp 7s ease-in-out infinite; }
+html[data-time="day"] .scene-bedroom.br-lamp-on .br-lampglow { opacity: .3; animation: none; }
+@keyframes br-lamp { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+
+/* music box: a soft pulse while it plays */
+.scene-bedroom .br-radioglow { opacity: 0; transition: opacity 1.2s ease-in-out; }
+.scene-bedroom.br-radio-on .br-radioglow { opacity: .7; animation: br-pulse 2.6s ease-in-out infinite; }
+@keyframes br-pulse { 0%, 100% { transform: scale(.9); } 50% { transform: scale(1.12); } }
+
+/* shooting star through the window */
+.scene-bedroom .br-shoot { overflow: hidden; }
+.scene-bedroom .br-shoot::after {
+  content: ''; position: absolute; left: 8%; top: 10%; width: 22%; height: 2px; opacity: 0;
+  background: linear-gradient(90deg, rgba(243, 236, 210, 0), rgba(243, 236, 210, .9));
+  transform: rotate(24deg); transform-origin: 100% 50%;
+}
+.scene-bedroom .br-shoot.br-go::after { animation: br-shoot 2.2s ease-out; }
+@keyframes br-shoot { 0% { opacity: 0; transform: translate(0, 0) rotate(24deg); } 15% { opacity: .9; } 100% { opacity: 0; transform: translate(260%, 220%) rotate(24deg); } }

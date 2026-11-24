@@ -1,0 +1,33 @@
+/* Living Room overlays on the painted stage. Prefix: lr- */
+
+.scene-livingroom .lr-fx { mix-blend-mode: normal; }
+
+/* fire glow: irregular, never strobing */
+.scene-livingroom .lr-fireglow { animation: lr-flicker 5.3s ease-in-out infinite; opacity: .8; transition: opacity 3s ease-in-out; }
+@keyframes lr-flicker {
+  0% { opacity: .72; transform: scale(1); } 17% { opacity: .9; transform: scale(1.03); } 31% { opacity: .78; transform: scale(.99); }
+  49% { opacity: .95; transform: scale(1.04); } 66% { opacity: .74; transform: scale(1); } 83% { opacity: .88; transform: scale(1.02); } 100% { opacity: .72; transform: scale(1); }
+}
+.scene-livingroom.lr-stir .lr-fireglow { animation: lr-stir 2.4s ease-out, lr-flicker 5.3s ease-in-out infinite; }
+@keyframes lr-stir { 0% { filter: brightness(1); } 25% { filter: brightness(1.5); } 100% { filter: brightness(1); } }
+
+/* breathing warm light over the whole room */
+.scene-livingroom .lr-roomwarm { opacity: .16; animation: lr-room 9s ease-in-out infinite; background: radial-gradient(ellipse at 30% 62%, var(--c), rgba(255, 150, 70, 0) 70%); }
+@keyframes lr-room { 0%, 100% { opacity: .1; } 50% { opacity: .2; } }
+html[data-time="day"] .scene-livingroom .lr-roomwarm { opacity: .06; animation: none; }
+html[data-time="day"] .scene-livingroom .lr-fireglow { opacity: .45; }
+
+/* lamp */
+.scene-livingroom .lr-lampglow { opacity: .55; transition: opacity 1.6s ease-in-out; }
+.scene-livingroom.lr-lampoff .lr-lampglow { opacity: 0; }
+html[data-time="day"] .scene-livingroom .lr-lampglow { opacity: .2; }
+.scene-livingroom .lr-dim {
+  background: radial-gradient(ellipse at 40% 55%, rgba(10, 14, 30, .05), rgba(10, 14, 30, .5));
+  opacity: 0; pointer-events: none; transition: opacity 1.6s ease-in-out;
+}
+.scene-livingroom.lr-lampoff .lr-dim { opacity: .55; }
+
+/* cat: a warm pulse while awake and purring */
+.scene-livingroom .lr-halo { opacity: 0; transition: opacity 1.2s ease-in-out; }
+.scene-livingroom .lr-halo.lr-awake { opacity: .8; animation: lr-purr 1.6s ease-in-out infinite; }
+@keyframes lr-purr { 0%, 100% { transform: scale(.96); } 50% { transform: scale(1.06); } }

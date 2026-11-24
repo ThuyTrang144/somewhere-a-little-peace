@@ -1,0 +1,87 @@
+/* Peace.paint - painted backdrop stage, fallbacks, shared overlay pieces. Prefix: pt- */
+
+.pt-breath {
+  position: absolute; inset: 0; transform-origin: 50% 55%;
+  animation: pt-breathe 24s ease-in-out infinite;
+}
+@keyframes pt-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+
+.pt-drift {
+  position: absolute; inset: 0;
+  transform: translate3d(var(--pt-px, 0px), var(--pt-py, 0px), 0) scale(1.014);
+  transition: transform 1.6s cubic-bezier(.2, .7, .2, 1);
+}
+
+/* 16:9 box that always covers the viewport, centred */
+.pt-stage {
+  position: absolute; left: 50%; top: 50%;
+  width: max(100vw, 177.7778vh); height: max(56.25vw, 100vh);
+  transform: translate(-50%, -50%);
+  overflow: hidden; background: #2b2520;
+}
+
+/* soft gradient per time: the floor under missing paintings */
+.pt-grad, .pt-img, .pt-vid, .pt-vids { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+.pt-grad { opacity: 0; transition: opacity 2.5s ease-in-out; }
+.pt-grad.on { opacity: 1; }
+.pt-grad-day { background: radial-gradient(ellipse at 50% 30%, #f6ecd4 0%, rgba(246, 236, 212, 0) 60%), linear-gradient(#cfe0e8 0%, #e9dcc3 52%, #b99a73 100%); }
+.pt-grad-dusk { background: radial-gradient(ellipse at 50% 60%, rgba(246, 217, 160, .55) 0%, rgba(246, 217, 160, 0) 60%), linear-gradient(#7c6f9c 0%, #d98f8f 48%, #f2b89a 70%, #5d4332 100%); }
+.pt-grad-night { background: radial-gradient(ellipse at 50% 70%, rgba(246, 217, 160, .14) 0%, rgba(246, 217, 160, 0) 55%), linear-gradient(#1d2a44 0%, #2f3f5c 60%, #1a2233 100%); }
+
+/* paintings: the incoming layer fades in over the outgoing one (class "was") */
+.pt-img { object-fit: cover; opacity: 0; z-index: 0; pointer-events: none; user-select: none; -webkit-user-drag: none; }
+.pt-img.was { opacity: 1; z-index: 1; }
+.pt-img.on.ok { opacity: 1; z-index: 2; transition: opacity 2.5s ease-in-out; }
+.pt-img.was:not(.ok) { opacity: 0; }
+.pt-instant .pt-img.on.ok, .pt-instant .pt-grad, .pt-instant .pt-vid { transition: none; }
+
+/* tint when only the base painting exists: base -> wanted time */
+.pt-f-day-dusk { filter: sepia(.5) saturate(1.3) hue-rotate(-14deg) brightness(.9) contrast(1.03); }
+.pt-f-day-night { filter: sepia(.55) hue-rotate(180deg) saturate(1.5) brightness(.42) contrast(1.05); }
+.pt-f-dusk-day { filter: saturate(.8) brightness(1.18) contrast(.95) hue-rotate(8deg); }
+.pt-f-dusk-night { filter: sepia(.3) hue-rotate(170deg) saturate(1.2) brightness(.45); }
+.pt-f-night-day { filter: sepia(.2) saturate(.55) brightness(1.9) contrast(.85); }
+.pt-f-night-dusk { filter: sepia(.55) saturate(1.3) hue-rotate(-15deg) brightness(1.35); }
+
+.pt-vids { z-index: 3; pointer-events: none; }
+.pt-vid { object-fit: cover; opacity: 0; transition: opacity 2.5s ease-in-out; pointer-events: none; }
+.pt-vid.ok.on { opacity: 1; }
+
+/* everything a scene appends sits above the painting */
+.pt-stage > :not(.pt-grad):not(.pt-img):not(.pt-vids) { z-index: 4; }
+
+/* hotspots: transparent buttons with a soft hover glow */
+.pt-hs {
+  position: absolute; display: block; margin: 0; padding: 0; border: 0; background: transparent;
+  font: inherit; color: inherit; border-radius: 10px; -webkit-tap-highlight-color: transparent;
+}
+.pt-hs:hover, .pt-hs:focus-visible {
+  background: radial-gradient(closest-side, rgba(246, 217, 160, .34), rgba(246, 217, 160, .12) 60%, rgba(246, 217, 160, 0));
+  filter: none;
+}
+
+.pt-box { position: absolute; pointer-events: none; }
+.pt-glow {
+  position: absolute; pointer-events: none; border-radius: 50%;
+  background: radial-gradient(closest-side, var(--c, rgba(255, 200, 120, .7)), rgba(255, 200, 120, 0));
+  mix-blend-mode: screen;
+}
+
+/* steam: three wisps, shown with "on" */
+.pt-steam { position: absolute; pointer-events: none; opacity: 0; transition: opacity 2s ease-in-out; }
+.pt-steam.on { opacity: 1; }
+.pt-steam i {
+  position: absolute; left: 50%; bottom: 0; width: 38%; height: 60%; margin-left: -19%;
+  border-radius: 50%; background: radial-gradient(closest-side, rgba(255, 250, 240, .55), rgba(255, 250, 240, 0));
+  filter: blur(3px); opacity: 0; animation: pt-steam 6.5s ease-in infinite;
+}
+.pt-steam i:nth-child(2) { left: 30%; animation-duration: 8s; animation-delay: -2.6s; }
+.pt-steam i:nth-child(3) { left: 70%; animation-duration: 7.2s; animation-delay: -4.6s; }
+@keyframes pt-steam {
+  0% { transform: translate(0, 20%) scale(.6); opacity: 0; }
+  20% { opacity: .75; }
+  100% { transform: translate(14%, -140%) scale(1.5); opacity: 0; }
+}
+
+html[data-motion="reduced"] .pt-drift { transform: none; }
+html[data-motion="reduced"] .pt-steam i { opacity: .4; }

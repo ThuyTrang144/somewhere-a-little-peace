@@ -1,0 +1,34 @@
+/* Sunset Corner overlays on the painted stage. Prefix: ss- */
+
+/* low sun glow: strongest at dusk, a whisper by day, gone at night */
+.scene-sunset .ss-sun { opacity: .3; transition: opacity 4s ease-in-out; animation: ss-sun 18s ease-in-out infinite; }
+html[data-time="dusk"] .scene-sunset .ss-sun { opacity: .7; }
+html[data-time="night"] .scene-sunset .ss-sun { opacity: 0; }
+@keyframes ss-sun { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(1.2%) scale(1.04); } }
+
+/* string bulbs: warm halos, a ripple of light when switched */
+.scene-sunset .ss-bulb { opacity: 0; transition: opacity 1.6s ease-in-out; transition-delay: calc(var(--i, 0) * 90ms); }
+.scene-sunset[data-lights="on"] .ss-bulb { opacity: .95; animation: ss-twinkle 6s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -0.7s); }
+html[data-time="day"] .scene-sunset[data-lights="on"] .ss-bulb { opacity: .4; }
+@keyframes ss-twinkle { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.2); } }
+.scene-sunset.ss-rip .ss-bulb { animation: ss-ripple 2.4s ease-in-out; animation-delay: calc(var(--i, 0) * 110ms); }
+@keyframes ss-ripple { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.35); filter: brightness(1.4); } }
+
+/* tea */
+.scene-sunset .ss-steam.ss-strong i { filter: blur(2px) brightness(1.2); }
+.scene-sunset .ss-stream {
+  background: linear-gradient(90deg, rgba(169, 98, 42, .9), rgba(242, 197, 138, .85)); border-radius: 3px;
+  transform-origin: 50% 0; transform: scaleY(0); opacity: 0;
+}
+.scene-sunset .ss-stream.ss-go { animation: ss-pour 3.8s ease-in-out forwards; }
+@keyframes ss-pour { 0% { transform: scaleY(0); opacity: 0; } 14% { transform: scaleY(1); opacity: .9; } 80% { transform: scaleY(1); opacity: .9; } 100% { transform: scaleY(1); opacity: 0; } }
+
+/* shooting star (night) */
+.scene-sunset .ss-meteor { overflow: hidden; }
+.scene-sunset .ss-meteor::after {
+  content: ''; position: absolute; left: var(--sx, 10%); top: 5%; width: 16%; height: 2px; opacity: 0;
+  background: linear-gradient(90deg, rgba(243, 236, 210, 0), rgba(243, 236, 210, .9));
+  transform: rotate(22deg); transform-origin: 100% 50%;
+}
+.scene-sunset .ss-meteor.ss-shoot::after { animation: ss-shoot 1.7s ease-out; }
+@keyframes ss-shoot { 0% { opacity: 0; transform: translate(0, 0) rotate(22deg); } 15% { opacity: .9; } 100% { opacity: 0; transform: translate(380%, 300%) rotate(22deg); } }

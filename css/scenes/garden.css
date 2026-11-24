@@ -1,0 +1,147 @@
+/* The garden: a painting plus code-only overlays. Everything is scoped under .scene-garden, prefix gd-.
+   Only transform / opacity are animated. Boxes are positioned in % of the 16:9 stage. */
+
+.scene-garden { background: #2b2520; }
+.scene-garden .gd-stage,
+.scene-garden .gd-top { position: absolute; overflow: hidden; --gd-w: 1600px; }
+.scene-garden .gd-stage { z-index: 1; isolation: isolate; background: #3a4a36; }
+.scene-garden .gd-canvas { z-index: 2; }
+.scene-garden .gd-top { z-index: 3; pointer-events: none; overflow: visible; }
+
+/* ------------------------------------------------------------ the painting */
+.scene-garden .gd-art,
+.scene-garden .gd-breath { position: absolute; inset: 0; will-change: transform; }
+.scene-garden .gd-breath { animation: gd-breathe 46s ease-in-out infinite alternate; transform-origin: 50% 55%; }
+.scene-garden .gd-img,
+.scene-garden .gd-vid {
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
+  user-select: none; -webkit-user-drag: none; pointer-events: none;
+}
+.scene-garden .gd-img-dusk,
+.scene-garden .gd-img-night,
+.scene-garden .gd-vid { opacity: 0; transition: opacity 2.8s ease-in-out; }
+.scene-garden .gd-vid { background: transparent; }
+html[data-time="dusk"] .scene-garden .gd-img-dusk,
+html[data-time="night"] .scene-garden .gd-img-dusk,
+html[data-time="night"] .scene-garden .gd-img-night { opacity: 1; }
+html[data-time="day"] .scene-garden .gd-vid-day.gd-on,
+html[data-time="dusk"] .scene-garden .gd-vid-dusk.gd-on,
+html[data-time="night"] .scene-garden .gd-vid-night.gd-on { opacity: 1; }
+
+/* a missing dusk / night painting falls back to the day one, graded with a filter */
+.scene-garden .gd-tint-dusk { filter: sepia(.38) saturate(1.25) hue-rotate(-14deg) brightness(.93) contrast(1.05); }
+.scene-garden .gd-tint-night { filter: sepia(.5) hue-rotate(185deg) saturate(1.35) brightness(.45) contrast(1.05); }
+
+@keyframes gd-breathe { from { transform: scale(1); } to { transform: scale(1.02); } }
+
+/* ------------------------------------------------------------ light shafts */
+.scene-garden .gd-shafts {
+  position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; opacity: .8;
+  transition: opacity 3s ease; animation: gd-shaft 9s ease-in-out infinite alternate; filter: blur(10px);
+}
+.scene-garden .gd-shafts i {
+  position: absolute; top: -12%; height: 130%; transform-origin: 50% 0; transform: rotate(-24deg);
+  background: linear-gradient(to bottom, rgba(255, 243, 207, .55), rgba(255, 240, 200, .18) 55%, rgba(255, 240, 200, 0));
+}
+html[data-time="dusk"] .scene-garden .gd-shafts { opacity: .5; }
+html[data-time="night"] .scene-garden .gd-shafts { opacity: 0; }
+@keyframes gd-shaft { from { transform: translate3d(-.6%, 0, 0); } to { transform: translate3d(.8%, 0, 0); } }
+
+/* ------------------------------------------------------------ drifting leaf shadows */
+.scene-garden .gd-leafsh { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .5; transition: opacity 3s ease; }
+.scene-garden .gd-leafsh i {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(20, 45, 32, .55), rgba(20, 45, 32, 0) 70%);
+  animation: gd-lsd var(--d, 18s) ease-in-out infinite alternate; animation-delay: var(--l, 0s);
+}
+html[data-time="dusk"] .scene-garden .gd-leafsh { opacity: .3; }
+html[data-time="night"] .scene-garden .gd-leafsh { opacity: 0; }
+@keyframes gd-lsd { from { transform: translate3d(calc(var(--dx, 1%) * -1), calc(var(--dy, 1%) * -1), 0) scale(.94); } to { transform: translate3d(var(--dx, 1%), var(--dy, 1%), 0) scale(1.06); } }
+
+/* ------------------------------------------------------------ glows, only when a time's painting is missing */
+.scene-garden .gd-glows { position: absolute; inset: 0; pointer-events: none; }
+.scene-garden .gd-glow {
+  position: absolute; height: 0; transform: translate(-50%, -50%); border-radius: 50%; opacity: 0; mix-blend-mode: screen;
+  background: radial-gradient(circle, rgba(255, 226, 162, .95), rgba(246, 200, 120, .5) 40%, rgba(242, 180, 90, 0) 70%);
+  transition: opacity 3s ease;
+}
+html[data-time="dusk"] .scene-garden .gd-stage.gd-miss-dusk .gd-glow-window { opacity: .45; }
+html[data-time="night"] .scene-garden .gd-stage.gd-miss-night .gd-glow { opacity: .85; }
+.scene-garden .gd-stage.gd-miss-night .gd-glow-lantern { animation: gd-flick 4.3s ease-in-out infinite alternate; }
+@keyframes gd-flick { from { filter: brightness(.88); } to { filter: brightness(1.1); } }
+
+/* ------------------------------------------------------------ pond shimmer + ripples */
+.scene-garden .gd-pondA { position: absolute; pointer-events: none; }
+.scene-garden .gd-glint {
+  position: absolute; height: 1.5px; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .9), transparent);
+  opacity: 0; animation: gd-twk var(--d, 5s) ease-in-out infinite; animation-delay: var(--l, 0s);
+}
+@keyframes gd-twk { 0%, 100% { opacity: 0; transform: scaleX(.5); } 45%, 55% { opacity: .85; transform: scaleX(1); } }
+.scene-garden .gd-rip {
+  position: absolute; width: 30%; height: 30%; border-radius: 50%; border: 1.5px solid rgba(244, 248, 242, .75);
+  transform: translate(-50%, -50%) scale(.15); opacity: 0; pointer-events: none;
+}
+.scene-garden .gd-ripS { animation: gd-ripS var(--d, 12s) ease-out infinite; animation-delay: var(--l, 0s); border-width: 1px; }
+.scene-garden .gd-ripN { animation: gd-ripN 2.8s ease-out 1 both; animation-delay: var(--l, 0s); }
+@keyframes gd-ripS { 0% { transform: translate(-50%, -50%) scale(.2); opacity: 0; } 8% { opacity: .5; } 40%, 100% { transform: translate(-50%, -50%) scale(.9); opacity: 0; } }
+@keyframes gd-ripN { 0% { transform: translate(-50%, -50%) scale(.1); opacity: .95; } 100% { transform: translate(-50%, -50%) scale(calc(var(--sc, 1) * 1.7)); opacity: 0; } }
+
+/* ------------------------------------------------------------ chimney smoke */
+.scene-garden .gd-smoke { position: absolute; width: 0; height: 0; pointer-events: none; }
+.scene-garden .gd-smoke i {
+  position: absolute; left: 0; top: 0; width: calc(var(--gd-w) * .03); height: calc(var(--gd-w) * .03); margin: calc(var(--gd-w) * -.015) 0 0 calc(var(--gd-w) * -.015);
+  border-radius: 50%; background: radial-gradient(circle, rgba(250, 247, 240, .5), rgba(250, 247, 240, 0) 68%); opacity: 0;
+  animation: gd-smk var(--d, 14s) ease-out infinite; animation-delay: var(--l, 0s);
+}
+html[data-time="night"] .scene-garden .gd-smoke { opacity: .55; }
+@keyframes gd-smk {
+  0% { transform: translate3d(0, 0, 0) scale(.6); opacity: 0; }
+  12% { opacity: .75; }
+  100% { transform: translate3d(var(--dx, 5vmin), calc(var(--gd-w) * -.1), 0) scale(2.8); opacity: 0; }
+}
+
+/* ------------------------------------------------------------ petals + birds */
+.scene-garden .gd-sky { position: absolute; inset: 0; pointer-events: none; }
+.scene-garden .gd-petal {
+  position: absolute; width: calc(var(--gd-w) * .0085 * var(--sz, 1)); height: calc(var(--gd-w) * .0055 * var(--sz, 1)); border-radius: 60% 40% 60% 40%; opacity: 0;
+  animation: gd-pet var(--d, 6s) ease-in-out 1 forwards;
+}
+@keyframes gd-pet {
+  0% { transform: translate3d(0, 0, 0) rotate(0); opacity: 0; }
+  10% { opacity: .95; }
+  50% { transform: translate3d(calc(var(--gd-w) * .01 * var(--dx, 0) * .5), calc(var(--gd-w) * .0056 * var(--dy, 0) * .55), 0) rotate(calc(var(--r, 90deg) * .5)); }
+  100% { transform: translate3d(calc(var(--gd-w) * .01 * var(--dx, 0)), calc(var(--gd-w) * .0056 * var(--dy, 0)), 0) rotate(var(--r, 180deg)); opacity: 0; }
+}
+.scene-garden .gd-bird { position: absolute; left: 0; width: calc(var(--gd-w) * .018); animation: gd-bfly var(--d, 18s) linear 1 forwards; opacity: .75; }
+.scene-garden .gd-bird svg { display: block; width: 100%; height: auto; overflow: visible; }
+.scene-garden .gd-bwing { transform-origin: 0 0; animation: gd-flap .62s ease-in-out infinite alternate; }
+html[data-time="night"] .scene-garden .gd-bird { display: none; }
+@keyframes gd-bfly { from { transform: translate3d(calc(var(--gd-w) * -.05), 0, 0); } to { transform: translate3d(calc(var(--gd-w) * 1.05), calc(var(--gd-w) * -.03), 0); } }
+@keyframes gd-flap { from { transform: scaleY(1); } to { transform: scaleY(-.5); } }
+
+/* ------------------------------------------------------------ hotspots: transparent, with a soft glow on hover / focus */
+.scene-garden .gd-spots { position: absolute; inset: 0; pointer-events: none; }
+.scene-garden .gd-hs { position: absolute; pointer-events: auto; background: transparent; cursor: pointer; border-radius: 14px; }
+.scene-garden .gd-hs:hover, .scene-garden .gd-hs:focus-visible { filter: none; }
+.scene-garden .gd-hglow {
+  position: absolute; inset: -12%; border-radius: 50%; opacity: 0; pointer-events: none; transition: opacity .45s ease;
+  background: radial-gradient(ellipse at center, rgba(250, 226, 166, .55), rgba(246, 217, 160, .22) 50%, rgba(246, 217, 160, 0) 72%);
+}
+.scene-garden .gd-hs:hover .gd-hglow,
+.scene-garden .gd-hs:focus-visible .gd-hglow { opacity: 1; }
+.scene-garden .gd-hs:focus-visible { box-shadow: 0 0 0 2px rgba(251, 245, 233, .85), 0 0 18px rgba(246, 217, 160, .7); }
+
+/* a quiet line from the girl or the table */
+.scene-garden .gd-line {
+  position: absolute; pointer-events: none; opacity: 0; transform: translate3d(0, 6px, 0); white-space: nowrap;
+  font: 400 calc(var(--gd-w) * .016) / 1.1 var(--font-hand, cursive); color: #fbf5e9; text-shadow: 0 1px 6px rgba(40, 30, 22, .8), 0 0 14px rgba(40, 30, 22, .5);
+}
+.scene-garden .gd-line.gd-show { animation: gd-say 4.2s ease-in-out 1 forwards; }
+@keyframes gd-say { 0% { opacity: 0; transform: translate3d(0, 8px, 0); } 14%, 78% { opacity: 1; transform: translate3d(0, 0, 0); } 100% { opacity: 0; transform: translate3d(0, -6px, 0); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-garden .gd-breath, .scene-garden .gd-shafts, .scene-garden .gd-leafsh i, .scene-garden .gd-glint, .scene-garden .gd-ripS,
+  .scene-garden .gd-smoke i, .scene-garden .gd-bwing { animation: none; }
+  .scene-garden .gd-glint { opacity: .5; }
+  .scene-garden .gd-smoke i { opacity: .25; }
+}

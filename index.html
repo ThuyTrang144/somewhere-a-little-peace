@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en" data-time="day" data-entered="false">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Somewhere, A Little Peace</title>
+<meta name="description" content="A small, quiet world to rest in. Slow down. You're home.">
+<meta name="theme-color" content="#f4ead8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M6 26C5 14 12 6 27 5c.6 13-6.600 20.400-19 21z' fill='%238fa58a' stroke='%233b2f27' stroke-width='1.600' stroke-linejoin='round'/%3E%3Cpath d='M6 26c5-7 10-11 16-14' fill='none' stroke='%233b2f27' stroke-width='1.400' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Zen+Maru+Gothic:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/paint.css">
+<link rel="stylesheet" href="css/scenes/garden.css">
+<link rel="stylesheet" href="css/scenes/tearoom.css">
+<link rel="stylesheet" href="css/scenes/livingroom.css">
+<link rel="stylesheet" href="css/scenes/bedroom.css">
+<link rel="stylesheet" href="css/scenes/greenhouse.css">
+<link rel="stylesheet" href="css/scenes/sunset.css">
+<script defer src="js/core.js"></script>
+<script defer src="js/paint.js"></script>
+<script defer src="js/audio.js"></script>
+<script defer src="js/scenes/garden.js"></script>
+<script defer src="js/scenes/tearoom.js"></script>
+<script defer src="js/scenes/livingroom.js"></script>
+<script defer src="js/scenes/bedroom.js"></script>
+<script defer src="js/scenes/greenhouse.js"></script>
+<script defer src="js/scenes/sunset.js"></script>
+<script defer src="js/ui.js"></script>
+</head>
+<body>
+
+<noscript>
+  <p class="noscript">This little place is drawn and animated with JavaScript. Please turn it on, and come back to rest.</p>
+</noscript>
+
+<!-- Stage: scenes are mounted here by core.js. The veil is the warm light the transition dissolves through. -->
+<div id="stage" role="presentation"><div id="veil"></div></div>
+
+<!-- Film grain and vignette over every scene -->
+<div id="fx-vignette" class="fx" aria-hidden="true"></div>
+<div id="fx-grain" class="fx" aria-hidden="true"></div>
+
+<!-- Hotspot hint label -->
+<div id="hint" class="hint" aria-hidden="true"></div>
+
+<!-- Interface -->
+<div id="ui" class="ui" role="group" aria-label="Controls">
+  <div class="ui-left">
+    <button type="button" id="btn-sound" class="tok" data-act="sound" data-snd="on" data-label="Sound" aria-label="Sound" aria-haspopup="dialog">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4.500 9.600c0-.4.300-.7.700-.7h2.300l3.600-3.200c.5-.4 1.200-.1 1.200.6v11.400c0 .7-.7 1-1.200.6l-3.600-3.100H5.200c-.4 0-.7-.3-.7-.7z"/>
+        <path class="w1" d="M15.600 9.300c1.100 1.500 1.100 4 0 5.400"/>
+        <path class="w2" d="M18.200 6.900c2.100 2.900 2.100 7.300 0 10.200"/>
+        <path class="mx" d="M16 9.500l4.500 5M20.500 9.500L16 14.500"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="ui-centre">
+    <button type="button" id="btn-prev" class="tok tok-small" data-act="prev" data-label="Previous place" aria-label="Previous place">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.500 6.200c-1.600 1.900-3.500 3.800-4.600 5.600 1.200 1.900 3 3.900 4.600 5.800"/></svg>
+    </button>
+    <button type="button" id="btn-place" class="place" data-act="map" aria-haspopup="dialog" aria-label="Open the map. You are in The Garden">
+      <span id="place-name" class="place-name">The Garden</span>
+    </button>
+    <button type="button" id="btn-next" class="tok tok-small" data-act="next" data-label="Next place" aria-label="Next place">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.500 6.200c1.600 1.900 3.500 3.800 4.600 5.600-1.200 1.900-3 3.900-4.600 5.800"/></svg>
+    </button>
+  </div>
+
+  <div class="ui-right">
+    <button type="button" id="btn-journal" class="tok" data-act="journal" data-label="Journal" aria-label="Little Journal" aria-haspopup="dialog">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.200c-1.800-1.300-4.600-1.700-7.200-1.400v11.400c2.600-.3 5.400.1 7.200 1.400 1.800-1.300 4.600-1.700 7.200-1.400V5.800c-2.600-.3-5.400.1-7.200 1.400z"/><path d="M12 7.200v11.400"/></svg>
+    </button>
+    <button type="button" id="btn-breathe" class="tok" data-act="breathe" data-label="Breathe" aria-label="Breathe together">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.200"/><path d="M12 3.400a8.600 8.600 0 0 1 8.400 6.500M20.600 14.300a8.600 8.600 0 0 1-7.400 6.200M9 20.200a8.600 8.600 0 0 1-5.500-7"/></svg>
+    </button>
+    <button type="button" id="btn-letgo" class="tok" data-act="letgo" data-label="Let go" aria-label="Let go of a worry" aria-haspopup="dialog">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.500 14.500h17l-2.600 4.200c-.3.400-.7.600-1.200.6H7.300c-.5 0-.9-.2-1.200-.6z"/><path d="M12.200 4.200v9.600M12.200 4.400l5.400 8.600M12.200 6.600l-4.400 6.800"/></svg>
+    </button>
+    <button type="button" id="btn-time" class="tok" data-act="time" data-label="Time of day" aria-label="Time of day: day. Change to dusk">
+      <span class="ic-set" aria-hidden="true">
+        <svg class="ic ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.700"/><path d="M12 3.600v2M12 18.400v2M3.600 12h2M18.400 12h2M6.100 6.100l1.400 1.400M16.500 16.500l1.400 1.400M17.900 6.100l-1.400 1.400M7.500 16.500l-1.400 1.400"/></svg>
+        <svg class="ic ic-dusk" viewBox="0 0 24 24"><path d="M6.600 16.200a5.400 5.400 0 0 1 10.800 0"/><path d="M3.400 16.600h17.200M6 20.200h12M12 6.300v1.800M5.300 9.600l1.300 1.200M18.700 9.600l-1.300 1.200"/></svg>
+        <svg class="ic ic-moon" viewBox="0 0 24 24"><path d="M18.800 14.600A7.400 7.400 0 0 1 9.400 5.200a7.400 7.400 0 1 0 9.400 9.400z"/></svg>
+      </span>
+    </button>
+    <button type="button" id="btn-still" class="tok" data-act="still" data-label="Still mode" aria-label="Still mode" aria-pressed="false">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18.800C4.400 11 9.600 5.600 19 5c.4 8.400-4.400 13.600-12.400 13.800"/><path d="M5 19c3-4.400 6.400-7 10.400-9"/></svg>
+    </button>
+    <button type="button" id="btn-hide" class="tok" data-act="hide" data-label="Hide interface" aria-label="Hide the interface">
+      <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.800 11.600c2.200 3.400 5 5 8.200 5s6-1.600 8.200-5"/><path d="M12 16.800v2.200M7.200 15.700l-1.200 1.900M16.800 15.700l1.200 1.900M3.600 11.800l-1.400 1M20.400 11.800l1.400 1"/></svg>
+    </button>
+    <button type="button" id="btn-more" class="tok" data-act="more" data-label="More" aria-label="More" aria-haspopup="dialog">
+      <svg class="ic ic-fill" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6.200" cy="12.100" r="1.500"/><circle cx="12" cy="11.900" r="1.500"/><circle cx="17.800" cy="12.100" r="1.500"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Shown while the interface is hidden -->
+<button type="button" id="btn-reveal" class="tok tok-reveal" data-act="reveal" data-label="Show interface" aria-label="Show the interface">
+  <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.500 12c2.300-3.600 5-5.200 8.500-5.200s6.200 1.600 8.500 5.200c-2.300 3.600-5 5.200-8.500 5.200S5.800 15.600 3.500 12z"/><circle cx="12" cy="12" r="2.300"/></svg>
+</button>
+
+<!-- A kind note (appears once, after a long rest) -->
+<aside id="kindnote" class="kn" role="status" hidden>
+  <button type="button" class="kn-body" id="kindnote-btn" aria-label="A small note. Tap to put it away.">
+    <span class="kn-text">You have been resting for a little while. That is allowed.</span>
+  </button>
+</aside>
+
+<!-- Breathe -->
+<div id="breathe" class="bth" role="region" aria-label="Breathing" hidden>
+  <div class="bth-inner">
+    <div class="bth-orb" id="bth-orb" aria-hidden="true"></div>
+    <p class="bth-word" id="bth-word" aria-live="polite">breathe in</p>
+    <div class="bth-dots" id="bth-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </div>
+  <button type="button" class="bth-stop" id="bth-stop">stop, I am fine</button>
+</div>
+
+<!-- Let go: boats drift here -->
+<div id="lg-layer" class="lg-layer" aria-hidden="true"></div>
+
+<!-- Panels -->
+<div id="panels">
+
+  <dialog id="panel-sound" class="panel panel-sound" aria-labelledby="sound-h">
+    <div class="sheet"><div class="sheet-in">
+      <button type="button" class="sheet-x" data-close aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.500 6.800c4 3.600 7.600 7.200 11 10.600M17.400 6.400C13.600 10 10 13.800 6.800 17.600"/></svg>
+      </button>
+      <h2 id="sound-h" class="sheet-h">Sound</h2>
+      <p class="sheet-sub">music, and the sounds of each place</p>
+      <div id="sound-body"></div>
+    </div></div>
+  </dialog>
+
+  <dialog id="panel-map" class="panel panel-map" aria-labelledby="map-h">
+    <div class="sheet"><div class="sheet-in">
+      <button type="button" class="sheet-x" data-close aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.500 6.800c4 3.600 7.600 7.200 11 10.600M17.400 6.400C13.600 10 10 13.800 6.800 17.600"/></svg>
+      </button>
+      <h2 id="map-h" class="sheet-h">The little world</h2>
+      <p class="sheet-sub">choose a place to walk to</p>
+      <div id="map-body" class="mp-body"></div>
+    </div></div>
+  </dialog>
+
+  <dialog id="panel-journal" class="panel panel-journal" aria-labelledby="journal-h">
+    <div class="sheet"><div class="sheet-in">
+      <button type="button" class="sheet-x" data-close aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.500 6.800c4 3.600 7.600 7.200 11 10.600M17.400 6.400C13.600 10 10 13.800 6.800 17.600"/></svg>
+      </button>
+      <h2 id="journal-h" class="sheet-h">Little Journal</h2>
+      <p class="jr-date" id="jr-date"></p>
+      <div class="jr-promptrow">
+        <p id="jr-prompt" class="jr-prompt"></p>
+        <button type="button" id="jr-another" class="lnk">another question</button>
+      </div>
+      <textarea id="jr-text" class="jr-text" rows="5" aria-labelledby="jr-prompt" spellcheck="true" data-autofocus></textarea>
+      <div class="jr-actions">
+        <button type="button" id="jr-keep" class="btn btn-primary">Keep this page</button>
+        <button type="button" id="jr-new" class="btn" hidden>A new page</button>
+        <span id="jr-status" class="jr-status" role="status"></span>
+      </div>
+      <p class="jr-private">What you write here stays on this device, in this browser. It goes nowhere else.</p>
+      <h3 class="jr-listh" id="jr-listh" hidden>Pages you have kept</h3>
+      <ul id="jr-list" class="jn-list"></ul>
+    </div></div>
+  </dialog>
+
+  <dialog id="panel-letgo" class="panel panel-letgo" aria-labelledby="letgo-h">
+    <div class="sheet"><div class="sheet-in">
+      <button type="button" class="sheet-x" data-close aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.500 6.800c4 3.600 7.600 7.200 11 10.600M17.400 6.400C13.600 10 10 13.800 6.800 17.600"/></svg>
+      </button>
+      <h2 id="letgo-h" class="sheet-h">Let go</h2>
+      <form id="lg-form" class="lg-form" autocomplete="off">
+        <label for="lg-input" class="lg-label">What is weighing on you? Write it in one line.</label>
+        <input id="lg-input" class="lg-input" type="text" maxlength="56" placeholder="one line is enough" data-autofocus>
+        <button type="submit" class="btn btn-primary">Set it afloat</button>
+        <p class="lg-note">Nothing is saved. The words drift away with the boat.</p>
+      </form>
+    </div></div>
+  </dialog>
+
+  <dialog id="panel-more" class="panel panel-more" aria-labelledby="more-h">
+    <div class="sheet"><div class="sheet-in">
+      <button type="button" class="sheet-x" data-close aria-label="Close">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.500 6.800c4 3.600 7.600 7.200 11 10.600M17.400 6.400C13.600 10 10 13.800 6.800 17.600"/></svg>
+      </button>
+      <h2 id="more-h" class="sheet-h">A little more</h2>
+      <ul id="more-list" class="more-list"></ul>
+    </div></div>
+  </dialog>
+
+</div>
+
+<!-- Transition title card -->
+<div id="card" class="card" aria-hidden="true">
+  <div class="card-inner">
+    <svg class="card-flourish card-flourish-top" viewBox="0 0 240 28" aria-hidden="true"><path pathLength="1" d="M6 16c26-10 52 8 78-2s38-8 36 2c-2 8-12 6-10-1 2-6 14-4 24 0 24 9 50-8 86-2"/></svg>
+    <h2 class="card-name" id="card-name"></h2>
+    <p class="card-tag" id="card-tag"></p>
+    <svg class="card-flourish" viewBox="0 0 240 28" aria-hidden="true"><path pathLength="1" d="M6 14c30 8 54-6 82 2 14 4 22 4 32-2 10 6 18 6 32 2 28-8 54 6 82-2"/></svg>
+  </div>
+</div>
+
+<!-- Opening -->
+<div id="opening" class="opening">
+  <div class="op-veil"></div>
+  <div class="op-text">
+    <h1 class="op-title">
+      <span class="op-line op-l1">Slow down.</span>
+      <span class="op-line op-l2">You're home.</span>
+    </h1>
+    <p class="op-sub op-line op-l3">Leave the noise behind. Stay a little longer.</p>
+    <div class="op-actions op-line op-l4">
+      <button type="button" id="btn-enter" class="op-enter"><span>Enter the garden</span></button>
+      <div class="op-toggle" role="radiogroup" aria-label="Sound">
+        <button type="button" role="radio" aria-checked="true" data-snd="on">with sound</button>
+        <span class="op-slash" aria-hidden="true">/</span>
+        <button type="button" role="radio" aria-checked="false" data-snd="off">in silence</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="live" class="sr" aria-live="polite"></div>
+
+<!-- Shared SVG filters -->
+<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <filter id="paper-edge" x="-3%" y="-3%" width="106%" height="106%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.500" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs>
+</svg>
+
+</body>
+</html>

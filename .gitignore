@@ -1,0 +1,5 @@
+assets/art/_raw/
+assets/art/gen.log
+.DS_Store
+.claude/
+__pycache__/
